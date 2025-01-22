@@ -1,4 +1,5 @@
 #include "main.h"
+#include "subsystems.hpp"
 
 /////
 // For installation, upgrading, documentations, and tutorials, check out our website!
@@ -15,9 +16,9 @@ const int SWING_SPEED = 110;
 ///
 void default_constants() {
   // P, I, D, and Start I
-  chassis.pid_drive_constants_set(20.0, 0.0, 100.0);         // Fwd/rev constants, used for odom and non odom motions
+  chassis.pid_drive_constants_set(22.0, 0.0, 100.0);         // Fwd/rev constants, used for odom and non odom motions
   chassis.pid_heading_constants_set(11.0, 0.0, 20.0);        // Holds the robot straight while going forward without odom
-  chassis.pid_turn_constants_set(3.0, 0.05, 20.0, 15.0);     // Turn in place constants
+  chassis.pid_turn_constants_set(3.0, 0.05, 21, 15.0);     // Turn in place constants
   chassis.pid_swing_constants_set(6.0, 0.0, 65.0);           // Swing constants
   chassis.pid_odom_angular_constants_set(6.5, 0.0, 52.5);    // Angular control for odom motions
   chassis.pid_odom_boomerang_constants_set(5.8, 0.0, 32.5);  // Angular control for boomerang motions
@@ -87,6 +88,26 @@ void turnBack() {
   chassis.pid_wait();
 }
 
+void testy(){
+  chassis.pid_odom_set({
+        {{0_in, 0_in}, fwd, DRIVE_SPEED},
+        {{17.424_in, 32.098_in}, fwd, DRIVE_SPEED},
+        {{15.721_in, 45.199_in}, fwd, DRIVE_SPEED},
+        {{15.59_in, 31.312_in}, fwd, DRIVE_SPEED},
+    }, true);
+  chassis.pid_wait();
+  chassis.pid_odom_set({{{1.31_in, 31.443_in}, fwd, DRIVE_SPEED},
+        {{-36.552_in, 3.144_in}, fwd, DRIVE_SPEED},
+        {{-31.443_in, -3.799_in, 180_deg}, fwd, DRIVE_SPEED},
+        {{-31.443_in, -8.123_in}, fwd, DRIVE_SPEED}}, true);
+  chassis.pid_wait();
+  chassis.pid_odom_set({{{-78.869_in, 31.836_in}, fwd, DRIVE_SPEED},
+        {{-82.275_in, 48.081_in}, fwd, DRIVE_SPEED},
+        {{-64.457_in, 31.312_in}, fwd, DRIVE_SPEED},
+        {{-46.116_in, 37.862_in}, fwd, DRIVE_SPEED}}, true);
+  chassis.pid_wait();
+
+}
 ///
 // Swing Example
 ///

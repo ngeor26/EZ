@@ -32,5 +32,5 @@ void raiseMacro();
 void toggleMogo();
 void toggleDoinker();
 void shaky();
-void update_stack();
+void update_colorStack();
 void insideopcontrol();

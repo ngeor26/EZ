@@ -45,8 +45,8 @@
 
 // More includes here...
 #include "autons.hpp"
-#include "meat.hpp"
 #include "subsystems.hpp"
+#include "meat.hpp"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do

@@ -1,4 +1,5 @@
 #include "main.h"
+#include "pros/rtos.hpp"
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
@@ -29,6 +30,7 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
+    {"testy", testy},
       {"drive 48", drive_48},
       {"drive 96", drive_96},
       {"drive back 48", driveBack_48},
@@ -50,9 +52,9 @@ void initialize() {
   ez::as::initialize();
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 
-  while (true) {
-    std::cout << "X: " + util::to_string_with_precision(chassis.odom_x_get()) + " Y: " + util::to_string_with_precision(chassis.odom_y_get()) + " theta: " + util::to_string_with_precision(chassis.odom_theta_get()) << std::endl;
-  }
+  // while (true) {
+  //   std::cout << "X: " + util::to_string_with_precision(chassis.odom_x_get()) + " Y: " + util::to_string_with_precision(chassis.odom_y_get()) + " theta: " + util::to_string_with_precision(chassis.odom_theta_get()) << std::endl;
+  // }
 }
 
 void disabled() {
@@ -167,13 +169,17 @@ void opcontrol() {
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
 
+  // pros::Task controlTask(insideopcontrol);
+
+    // pros::Task vision_task(update_colorStack);
+
   while (true) {
     // Gives you some extras to make EZ-Template ezier
     ez_template_extras();
 
     chassis.opcontrol_arcade_standard(ez::SPLIT);  // Standard split arcade
-
-    insideopcontrol();
+    // insideopcontrol();
+    // update_colorStack();
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }

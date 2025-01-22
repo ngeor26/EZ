@@ -84,7 +84,7 @@ void shaky() {
 }
 
 void update_colorStack() {
-  while (true) {
+  // while (true) {
     pros::vision_object_s_t object_arr[3];
 
     int y1 = 0;
@@ -115,13 +115,12 @@ void update_colorStack() {
 
     std::cout << "Bottom: " + colorStack[0] << " Top: " + colorStack[1] << std::endl;
 
-    pros::delay(200);
-  }
+    // pros::delay(200);
+  // }
 }
 
 void insideopcontrol() {
-  pros::Task vision_task(update_stack);
-  while (true) {
+  // while (true) {
     hasSecond = ultrasonic.get_value() > 50;
 
     if (master.get_digital(DIGITAL_R2) && flipper.get_position() > -50 && (!(colorStack[0] != "" && colorStack[1] != "") || master.get_digital(DIGITAL_Y))) {
@@ -165,4 +164,5 @@ void insideopcontrol() {
     if (master.get_digital(DIGITAL_LEFT) && !isFlipping) {
       pros::Task shake_task(shaky);
     }
-  }
+  // }
+}
