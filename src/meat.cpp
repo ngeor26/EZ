@@ -31,6 +31,12 @@ void doFlip() {
   isFlipping = false;
 }
 
+void doFlipNoBack() {
+  isFlipping = true;
+  flipper.move_absolute(-800, 200);
+  isFlipping = false;
+}
+
 void toggleArm() {
   canRaise = false;
   arm.set_value(!isRaised);

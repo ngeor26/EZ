@@ -27,6 +27,7 @@ extern std::string colorStack[2];
 
 // Function declarations
 void doFlip();
+void doFlipNoBack();
 void toggleArm();
 void raiseMacro();
 void toggleMogo();

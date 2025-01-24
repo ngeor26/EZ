@@ -1,4 +1,6 @@
 #include "main.h"
+#include "meat.hpp"
+#include "pros/rtos.hpp"
 #include "subsystems.hpp"
 
 /////
@@ -88,25 +90,78 @@ void turnBack() {
   chassis.pid_wait();
 }
 
-void testy(){
-  chassis.pid_odom_set({
-        {{0_in, 0_in}, fwd, DRIVE_SPEED},
-        {{17.424_in, 32.098_in}, fwd, DRIVE_SPEED},
-        {{15.721_in, 45.199_in}, fwd, DRIVE_SPEED},
-        {{15.59_in, 31.312_in}, fwd, DRIVE_SPEED},
-    }, true);
-  chassis.pid_wait();
-  chassis.pid_odom_set({{{1.31_in, 31.443_in}, fwd, DRIVE_SPEED},
-        {{-36.552_in, 3.144_in}, fwd, DRIVE_SPEED},
-        {{-31.443_in, -3.799_in, 180_deg}, fwd, DRIVE_SPEED},
-        {{-31.443_in, -8.123_in}, fwd, DRIVE_SPEED}}, true);
-  chassis.pid_wait();
-  chassis.pid_odom_set({{{-78.869_in, 31.836_in}, fwd, DRIVE_SPEED},
-        {{-82.275_in, 48.081_in}, fwd, DRIVE_SPEED},
-        {{-64.457_in, 31.312_in}, fwd, DRIVE_SPEED},
-        {{-46.116_in, 37.862_in}, fwd, DRIVE_SPEED}}, true);
-  chassis.pid_wait();
+void turnToHeading(double heading){
+  chassis.pid_turn_set(heading, TURN_SPEED);
+  chassis.pid_wait_quick();
+}
 
+void drive_dist(double dist, int speed=DRIVE_SPEED){
+  chassis.pid_drive_set(dist, speed);
+  chassis.pid_wait_quick();
+}
+
+void testy(){
+  // chassis.pid_odom_set({
+  //       {{0_in, 0_in}, fwd, DRIVE_SPEED},
+  //       {{17.424_in, 32.098_in}, fwd, DRIVE_SPEED},
+  //       {{15.721_in, 45.199_in}, fwd, DRIVE_SPEED},
+  //       {{15.59_in, 31.312_in}, fwd, DRIVE_SPEED},
+  //   }, true);
+  // chassis.pid_wait();
+  // chassis.pid_odom_set({{{1.31_in, 31.443_in}, fwd, DRIVE_SPEED},
+
+  //       {{-31.443_in, -8.123_in, 180_deg}, fwd, DRIVE_SPEED}}, true);
+  // chassis.pid_wait();
+  // chassis.pid_odom_set({{{-78.869_in, 31.836_in}, fwd, DRIVE_SPEED},
+  //       {{-82.275_in, 48.081_in}, fwd, DRIVE_SPEED},
+  //       {{-64.457_in, 31.312_in}, fwd, DRIVE_SPEED},
+  //       {{-46.116_in, 37.862_in}, fwd, DRIVE_SPEED}}, true);
+  // chassis.pid_wait();
+  turnToHeading(27.7);
+  intake.move_velocity(-300);
+  drive_dist(34, 127);
+  turnToHeading(90);
+  drive_dist(-15, 60);
+  intake.move_velocity(550);
+  toggleMogo();
+  pros::Task flip_task([]{
+    pros::Task::delay(1000);
+    doFlip();
+    toggleMogo();
+  });
+  turnToHeading(231);
+  intake.move_velocity(-300);
+  drive_dist(26, 127);
+  drive_dist(31, 50);
+  toggleMogo();
+  turnToHeading(90);
+  intake.move_velocity(550);
+  drive_dist(18, 127);
+  turnToHeading(360);
+  // drive_dist(-12);
+  chassis.drive_set(-127, -127);
+  pros::delay(700);
+  chassis.drive_set(0,0);
+  doFlip();
+  drive_dist(3);
+  turnToHeading(306);
+  intake.move_velocity(-400);
+  drive_dist(52, 127);
+  pros::Task mogoTask([]{
+    toggleMogo();
+  });
+  turnToHeading(258);
+  drive_dist(-20, 127);
+  pros::Task([]{
+    pros::Task::delay(500);
+    flipper.move_absolute(-800, 200);
+  });
+  toggleMogo();
+  // pros::Task flip_task2([] {
+  // doFlipNoBack();
+    // flipper.move_absolute(-800, 200);
+  // });
+  drive_dist(-50, 127);
 }
 ///
 // Swing Example
