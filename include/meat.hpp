@@ -23,7 +23,11 @@ extern bool buttonUnpressed;
 extern int numRings;
 extern bool hasSecond;
 
+extern bool atBase;
+
 extern std::string colorStack[2];
+
+extern std::string color;
 
 // Function declarations
 void doFlip();

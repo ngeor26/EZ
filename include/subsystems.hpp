@@ -17,7 +17,7 @@ inline pros::adi::DigitalOut doinker('E');
 
 inline pros::adi::DigitalOut arm('D');
 
-inline pros::adi::Button limit_switch('F');
+inline pros::adi::DigitalIn limit_switch('F');
 
 inline pros::adi::Ultrasonic ultrasonic('G', 'H');
 

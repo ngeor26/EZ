@@ -1,3 +1,5 @@
+#include <math.h>
+#include <type_traits>
 #include "main.h"
 
 bool isFlipping = false;
@@ -16,19 +18,25 @@ bool buttonUnpressed = true;
 int numRings = 0;
 bool hasSecond = false;
 
+bool atBase = true;
+
 std::string colorStack[2] = {"", ""};
 
+std::string color = "blue";
+
 void doFlip() {
+  atBase = false;
   isFlipping = true;
-  if (((autonState == 0 || autonState == 1 || autonState == 2) && colorStack[0] == "Red") || ((autonState == 3 || autonState == 4 || autonState == 5) && colorStack[0] == "Blue")) {
+  if ((color == "blue" && colorStack[0] == "Red") || (color == "red" && colorStack[0] == "Blue")) {
     flipper.move_absolute(-700, 150);
   } else {
-    flipper.move_absolute(-1060, 200);
+    flipper.move_absolute(-1150, 200);
   }
   pros::delay(500);
   flipper.move_absolute(0, 55);
   pros::delay(800);
   isFlipping = false;
+  atBase = true;
 }
 
 void doFlipNoBack() {
@@ -119,7 +127,7 @@ void update_colorStack() {
       }
     }
 
-    std::cout << "Bottom: " + colorStack[0] << " Top: " + colorStack[1] << std::endl;
+    // std::cout << "Bottom: " + colorStack[0] << " Top: " + colorStack[1] << std::endl;
 
     // pros::delay(200);
   // }
@@ -130,7 +138,7 @@ void insideopcontrol() {
     hasSecond = ultrasonic.get_value() > 50;
 
     if (master.get_digital(DIGITAL_R2) && flipper.get_position() > -50 && (!(colorStack[0] != "" && colorStack[1] != "") || master.get_digital(DIGITAL_Y))) {
-      intake.move_velocity(-600);
+      intake.move_velocity(-450);
     } else if (master.get_digital(DIGITAL_L2)) {
       intake.move_velocity(550);
     } else {
@@ -139,11 +147,13 @@ void insideopcontrol() {
 
     if (!isFlipping) {
       if (master.get_digital(DIGITAL_RIGHT)) {
-        flipper.move(-127);
-      } else if (master.get_digital(DIGITAL_DOWN)) {
-        flipper.move(50);
+        atBase = false;
+        flipper.move_absolute(-1150, 150);
       } else {
-        flipper.brake();
+        if(!atBase){
+          atBase = true;
+          flipper.move_absolute(0, 55); 
+        }
       }
     }
 
@@ -155,9 +165,15 @@ void insideopcontrol() {
       pros::Task raise_macro(raiseMacro);
     }
 
-    if (master.get_digital(DIGITAL_L1) && canMogo) {
-      pros::Task mogo_task(toggleMogo);
-    }
+    // if (master.get_digital(DIGITAL_L1) && canMogo) {
+    //   pros::Task mogo_task(toggleMogo);
+    // }
+
+    // if (master.get_digital(DIGITAL_L1)) {
+    //   mogo.set_value(false);
+    // } else {
+    //   mogo.set_value(true);
+    // }
 
     if (master.get_digital(DIGITAL_X) && canDoinker) {
       pros::Task doinker_task(toggleDoinker);

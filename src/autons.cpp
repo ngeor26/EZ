@@ -1,3 +1,4 @@
+#include "EZ-Template/drive/drive.hpp"
 #include "main.h"
 #include "meat.hpp"
 #include "pros/rtos.hpp"
@@ -101,28 +102,78 @@ void drive_dist(double dist, int speed=DRIVE_SPEED){
 }
 
 void testy(){
-  // chassis.pid_odom_set({
-  //       {{0_in, 0_in}, fwd, DRIVE_SPEED},
-  //       {{17.424_in, 32.098_in}, fwd, DRIVE_SPEED},
-  //       {{15.721_in, 45.199_in}, fwd, DRIVE_SPEED},
-  //       {{15.59_in, 31.312_in}, fwd, DRIVE_SPEED},
-  //   }, true);
-  // chassis.pid_wait();
-  // chassis.pid_odom_set({{{1.31_in, 31.443_in}, fwd, DRIVE_SPEED},
+  turnToHeading(27.7);
+  intake.move_velocity(-400);
+  drive_dist(34, 127);
+  pros::delay(450);
+  turnToHeading(90);
+  drive_dist(-15, 55);
+  intake.move_velocity(0);
+  toggleMogo();
+  pros::Task flip_task([]{
+    pros::Task::delay(500);
+    doFlip();
+    toggleMogo();
+  });
+  turnToHeading(231);
+  intake.move_velocity(-400);
+  drive_dist(26, 127);
+  drive_dist(29, 50);
+  toggleMogo();
+  pros::delay(200);
+  turnToHeading(90);
+  intake.move_velocity(80);
+  drive_dist(16, 127);
+  turnToHeading(360);
+  // drive_dist(-12);
+  chassis.drive_set(-50, -50);
+  pros::delay(700);
+  chassis.drive_set(0,0);
+  // doFlip();
+  flipper.move_absolute(-1060, 200);
+  pros::delay(500);
+  flipper.move_absolute(0, 55);
+  drive_dist(3);
+  turnToHeading(306);
+  intake.move_velocity(-300);
+  drive_dist(52, 127);
+  pros::Task mogoTask([]{
+    toggleMogo();
+  });
+  turnToHeading(258);
+  drive_dist(-18.5, 70);
+  pros::Task([]{
+    pros::Task::delay(200);
+    flipper.move_absolute(-1150, 200);
+    atBase = false;
+    pros::delay(500);
+    toggleArm();
+    // flipper.move_absolute(-500, 200);
+  });
+  toggleMogo();
+  // pros::delay(350);
+  pros::delay(800);
+  intake.move_velocity(0);
+  // pros::Task flip_task2([] {
+  // doFlipNoBack();
+    // flipper.move_absolute(-800, 200);
+  // });
+  drive_dist(-15, 127);
+}
 
-  //       {{-31.443_in, -8.123_in, 180_deg}, fwd, DRIVE_SPEED}}, true);
-  // chassis.pid_wait();
-  // chassis.pid_odom_set({{{-78.869_in, 31.836_in}, fwd, DRIVE_SPEED},
-  //       {{-82.275_in, 48.081_in}, fwd, DRIVE_SPEED},
-  //       {{-64.457_in, 31.312_in}, fwd, DRIVE_SPEED},
-  //       {{-46.116_in, 37.862_in}, fwd, DRIVE_SPEED}}, true);
-  // chassis.pid_wait();
+void mirrored(){
+  chassis.odom_x_flip();
+  chassis.odom_theta_flip();
+  testy();
+}
+
+void testy_cut(){
   turnToHeading(27.7);
   intake.move_velocity(-300);
   drive_dist(34, 127);
   turnToHeading(90);
   drive_dist(-15, 60);
-  intake.move_velocity(550);
+  intake.move_velocity(0);
   toggleMogo();
   pros::Task flip_task([]{
     pros::Task::delay(1000);
@@ -132,37 +183,79 @@ void testy(){
   turnToHeading(231);
   intake.move_velocity(-300);
   drive_dist(26, 127);
-  drive_dist(31, 50);
+  drive_dist(29, 50);
   toggleMogo();
   turnToHeading(90);
-  intake.move_velocity(550);
-  drive_dist(18, 127);
+  intake.move_velocity(0);
+  drive_dist(15, 127);
   turnToHeading(360);
   // drive_dist(-12);
   chassis.drive_set(-127, -127);
   pros::delay(700);
   chassis.drive_set(0,0);
-  doFlip();
-  drive_dist(3);
-  turnToHeading(306);
-  intake.move_velocity(-400);
-  drive_dist(52, 127);
-  pros::Task mogoTask([]{
-    toggleMogo();
-  });
-  turnToHeading(258);
-  drive_dist(-20, 127);
-  pros::Task([]{
-    pros::Task::delay(500);
-    flipper.move_absolute(-800, 200);
-  });
-  toggleMogo();
-  // pros::Task flip_task2([] {
-  // doFlipNoBack();
-    // flipper.move_absolute(-800, 200);
-  // });
-  drive_dist(-50, 127);
+  // doFlip();
+  flipper.move_absolute(-1060, 200);
+  pros::delay(500);
+  flipper.move_absolute(0, 55);
 }
+
+void skills(){
+  doFlip();
+  drive_dist(20);
+  turnToHeading(53);
+  intake.move_velocity(-500);
+  drive_dist(69.5);
+  pros::delay(800);
+  intake.move_velocity(0);
+  turnToHeading(270);
+  pros::delay(200);
+  toggleArm();
+  intake.move_velocity(500);
+  // drive_dist(-7.5, 50);
+  chassis.drive_set(-50, -50);
+  pros::delay(500);
+  chassis.drive_set(0, 0);
+  doFlip();
+  
+  drive_dist(20);
+  toggleArm();
+  turnToHeading(22.6);
+  intake.move_velocity(-450);
+  drive_dist(51);
+  pros::delay(600);
+  intake.move_velocity(0);
+  pros::delay(400);
+  turnToHeading(20);
+
+
+  drive_dist(-75);
+  drive_dist(-30, 80);
+  toggleMogo();
+  pros::delay(600);
+  doFlip();
+  drive_dist(47);
+  turnToHeading(153);
+  pros::delay(1000);
+  // intake.move_velocity(-500);
+  // drive_dist(40);
+  // pros::delay(600);
+  // drive_dist(-13);
+  // doFlip();
+  // turnToHeading(180);
+  // drive_dist(28.5, 100);
+  // pros::delay(900);
+  // doFlip();
+  // drive_dist(-6);
+  // turnToHeading(312);
+  // toggleMogo();
+  // drive_dist(-16);
+  // raiseMacro();
+  // drive_dist(67.3, 90);
+  // chassis.drive_set(-127, -127);
+  // pros::delay(3000 );
+  // chassis.drive_set(0,0);
+}
+
 ///
 // Swing Example
 ///
@@ -307,7 +400,7 @@ void measure_offsets() {
     chassis.pid_targets_reset();
     chassis.drive_imu_reset();
     chassis.drive_sensor_reset();
-    chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
+    chassis.drive_brake_set(pros::E_MOTOR_BRAKE_HOLD);
     chassis.odom_xyt_set(0_in, 0_in, 0_deg);
     double imu_start = chassis.odom_theta_get();
     double target = i % 2 == 0 ? 90 : 270;  // Switch the turn target every run from 270 to 90

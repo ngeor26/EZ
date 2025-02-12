@@ -1,5 +1,8 @@
 #include "main.h"
+#include "EZ-Template/sdcard.hpp"
+#include "autons.hpp"
 #include "pros/rtos.hpp"
+#include "subsystems.hpp"
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
@@ -10,7 +13,7 @@ ez::Drive chassis(
     2.75,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     450);  // Wheel RPM = cartridge * (motor gear / wheel gear)
 
-ez::tracking_wheel horiz_tracker(-11, 2.125, 0.875);  // This tracking wheel is perpendicular to the drive wheels
+ez::tracking_wheel horiz_tracker(-11, 2.125, 2.25);  // This tracking wheel is perpendicular to the drive wheels
 
 void initialize() {
   // Print our branding over your terminal :D
@@ -30,26 +33,36 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-    {"testy", testy},
-      {"drive 48", drive_48},
-      {"drive 96", drive_96},
-      {"drive back 48", driveBack_48},
-      {"drive back 96", driveBack_96},
-      {"turn 90", turn_90},
-      {"turn 180", turn_180},
-      {"turn 360", turn_360},
-      {"turn back", turnBack},
-      {"Simple Odom\n\nThis is the same as the drive example, but it uses odom instead!", odom_drive_example},
-      {"Pure Pursuit\n\nGo to (0, 30) and pass through (6, 10) on the way.  Come back to (0, 0)", odom_pure_pursuit_example},
-      {"Pure Pursuit Wait Until\n\nGo to (24, 24) but start running an intake once the robot passes (12, 24)", odom_pure_pursuit_wait_until_example},
-      {"Boomerang\n\nGo to (0, 24, 45) then come back to (0, 0, 0)", odom_boomerang_example},
-      {"Boomerang Pure Pursuit\n\nGo to (0, 24, 45) on the way to (24, 24) then come back to (0, 0, 0)", odom_boomerang_injected_pure_pursuit_example},
-      {"Measure Offsets\n\nThis will turn the robot a bunch of times and calculate your offsets for your tracking wheels.", measure_offsets},
+    {"skills", skills},
+        {"fun red", testy},
+    {"fun blue", testy},
+        {"mirrored red", mirrored},
+          {"mirrored blue", mirrored},
+    {"cut red", testy_cut},
+    {"cut blue", testy_cut},
+        {"skills", skills},
+
+    
+      // {"drive 48", drive_48},
+      // {"drive 96", drive_96},
+      // {"drive back 48", driveBack_48},
+      // {"drive back 96", driveBack_96},
+      // {"turn 90", turn_90},
+      // {"turn 180", turn_180},
+      // {"turn 360", turn_360},
+      // {"turn back", turnBack},
+      // {"Simple Odom\n\nThis is the same as the drive example, but it uses odom instead!", odom_drive_example},
+      // {"Pure Pursuit\n\nGo to (0, 30) and pass through (6, 10) on the way.  Come back to (0, 0)", odom_pure_pursuit_example},
+      // {"Pure Pursuit Wait Until\n\nGo to (24, 24) but start running an intake once the robot passes (12, 24)", odom_pure_pursuit_wait_until_example},
+      // {"Boomerang\n\nGo to (0, 24, 45) then come back to (0, 0, 0)", odom_boomerang_example},
+      // {"Boomerang Pure Pursuit\n\nGo to (0, 24, 45) on the way to (24, 24) then come back to (0, 0, 0)", odom_boomerang_injected_pure_pursuit_example},
+      // {"Measure Offsets\n\nThis will turn the robot a bunch of times and calculate your offsets for your tracking wheels.", measure_offsets},
   });
 
   // Initialize chassis and auton selector
   chassis.initialize();
   ez::as::initialize();
+  ez::as::limit_switch_lcd_initialize(&limit_switch);
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 
   // while (true) {
@@ -169,6 +182,18 @@ void opcontrol() {
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
 
+  if(ez::as::auton_selector.auton_page_current == 1 || ez::as::auton_selector.auton_page_current == 3 || ez::as::auton_selector.auton_page_current == 5){
+    color = "blue";
+  } else if(ez::as::auton_selector.auton_page_current == 0 || ez::as::auton_selector.auton_page_current == 2 || ez::as::auton_selector.auton_page_current == 4) {
+    color = "red";
+  } else if(ez::as::auton_selector.auton_page_current == 6){
+    return;
+  }
+
+  
+
+  std::cout << color << std::endl;
+
   // pros::Task controlTask(insideopcontrol);
 
     // pros::Task vision_task(update_colorStack);
@@ -178,8 +203,8 @@ void opcontrol() {
     ez_template_extras();
 
     chassis.opcontrol_arcade_standard(ez::SPLIT);  // Standard split arcade
-    // insideopcontrol();
-    // update_colorStack();
+    insideopcontrol();
+    update_colorStack();
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
