@@ -19,6 +19,8 @@ inline pros::adi::DigitalOut arm('D');
 
 inline pros::adi::DigitalIn limit_switch('F');
 
+inline pros::adi::DigitalIn intake_limit('A');
+
 inline pros::adi::Ultrasonic ultrasonic('G', 'H');
 
 inline pros::Vision vision(15);

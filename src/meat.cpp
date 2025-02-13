@@ -1,5 +1,7 @@
 #include <math.h>
+
 #include <type_traits>
+
 #include "main.h"
 
 bool isFlipping = false;
@@ -19,6 +21,8 @@ int numRings = 0;
 bool hasSecond = false;
 
 bool atBase = true;
+
+bool slowIntake = false;
 
 std::string colorStack[2] = {"", ""};
 
@@ -99,92 +103,103 @@ void shaky() {
 
 void update_colorStack() {
   // while (true) {
-    pros::vision_object_s_t object_arr[3];
+  pros::vision_object_s_t object_arr[3];
 
-    int y1 = 0;
-    int y2 = 0;
-    std::string color1 = "";
-    std::string color2 = "";
+  int y1 = 0;
+  int y2 = 0;
+  std::string color1 = "";
+  std::string color2 = "";
 
-    vision.read_by_size(0, 3, object_arr);
+  vision.read_by_size(0, 3, object_arr);
 
-    for (int i = 0; i < 3; i++) {
-      if (object_arr[i].height > 150 && (object_arr[i].signature == 1 || object_arr[i].signature == 2)) {
-        if (y1 != 0) {
-          y2 = object_arr[i].y_middle_coord;
-          color2 = (object_arr[i].signature == 1) ? "Red" : "Blue";
-        } else {
-          y1 = object_arr[i].y_middle_coord;
-          color1 = (object_arr[i].signature == 1) ? "Red" : "Blue";
-        }
-      }
-      if (y2 < y1) {
-        colorStack[1] = color2;
-        colorStack[0] = color1;
+  for (int i = 0; i < 3; i++) {
+    if (object_arr[i].height > 150 && (object_arr[i].signature == 1 || object_arr[i].signature == 2)) {
+      if (y1 != 0) {
+        y2 = object_arr[i].y_middle_coord;
+        color2 = (object_arr[i].signature == 1) ? "Red" : "Blue";
       } else {
-        colorStack[1] = color1;
-        colorStack[0] = color2;
+        y1 = object_arr[i].y_middle_coord;
+        color1 = (object_arr[i].signature == 1) ? "Red" : "Blue";
       }
     }
+    if (y2 < y1) {
+      colorStack[1] = color2;
+      colorStack[0] = color1;
+    } else {
+      colorStack[1] = color1;
+      colorStack[0] = color2;
+    }
+  }
 
-    // std::cout << "Bottom: " + colorStack[0] << " Top: " + colorStack[1] << std::endl;
+  // std::cout << "Bottom: " + colorStack[0] << " Top: " + colorStack[1] << std::endl;
 
-    // pros::delay(200);
+  // pros::delay(200);
   // }
 }
 
 void insideopcontrol() {
   // while (true) {
-    hasSecond = ultrasonic.get_value() > 50;
+  hasSecond = ultrasonic.get_value() > 50;
 
-    if (master.get_digital(DIGITAL_R2) && flipper.get_position() > -50 && (!(colorStack[0] != "" && colorStack[1] != "") || master.get_digital(DIGITAL_Y))) {
-      intake.move_velocity(-450);
-    } else if (master.get_digital(DIGITAL_L2)) {
-      intake.move_velocity(550);
-    } else {
-      intake.move_velocity(0);
+  if (master.get_digital(DIGITAL_R2) && flipper.get_position() > -50 && (!(colorStack[0] != "" && colorStack[1] != "") || master.get_digital(DIGITAL_Y))) {
+    if (intake_limit.get_value() == 1 && !slowIntake) {
+      slowIntake = true;
+      pros::Task slowIntakeTask([] {
+        pros::delay(1000);
+        slowIntake = false;
+      });
     }
+    if (slowIntake) {
+      intake.move_velocity(-300);
+    } else {
+      intake.move_velocity(-450);
+    }
+  } else if (master.get_digital(DIGITAL_L2)) {
+    intake.move_velocity(550);
+  } else {
+    intake.move_velocity(0);
+  }
 
-    if (!isFlipping) {
-      if (master.get_digital(DIGITAL_RIGHT)) {
-        atBase = false;
-        flipper.move_absolute(-1150, 150);
-      } else {
-        if(!atBase){
-          atBase = true;
-          flipper.move_absolute(0, 55); 
-        }
+  if (!isFlipping) {
+    if (master.get_digital(DIGITAL_RIGHT)) {
+      atBase = false;
+      flipper.move_absolute(-1150, 150);
+    } else {
+      if (!atBase) {
+        atBase = true;
+        flipper.move_absolute(0, 55);
       }
     }
+  }
 
-    if (master.get_digital(DIGITAL_B) && canRaise) {
-      pros::Task raise_task(toggleArm);
-    }
+  if (master.get_digital(DIGITAL_B) && canRaise) {
+    pros::Task raise_task(toggleArm);
+  }
 
-    if (master.get_digital(DIGITAL_A) && canRaise) {
-      pros::Task raise_macro(raiseMacro);
-    }
+  if (master.get_digital(DIGITAL_A) && canRaise) {
+    pros::Task raise_macro(raiseMacro);
+  }
 
-    // if (master.get_digital(DIGITAL_L1) && canMogo) {
-    //   pros::Task mogo_task(toggleMogo);
-    // }
+  // if (master.get_digital(DIGITAL_L1) && canMogo) {
+  //   pros::Task mogo_task(toggleMogo);
+  // }
 
-    // if (master.get_digital(DIGITAL_L1)) {
-    //   mogo.set_value(false);
-    // } else {
-    //   mogo.set_value(true);
-    // }
+  // if (master.get_digital(DIGITAL_L1)) {
+  //   mogo.set_value(false);
+  // } else {
+  //   mogo.set_value(true);
+  // }
 
-    if (master.get_digital(DIGITAL_X) && canDoinker) {
-      pros::Task doinker_task(toggleDoinker);
-    }
+  if (master.get_digital(DIGITAL_X) && canDoinker) {
+    pros::Task doinker_task(toggleDoinker);
+  }
 
-    if (master.get_digital(DIGITAL_R1) && !isFlipping) {
-      pros::Task flip_task(doFlip);
-    }
+  if (master.get_digital(DIGITAL_R1) && !isFlipping) {
+    pros::Task flip_task(doFlip);
+  }
 
-    if (master.get_digital(DIGITAL_LEFT) && !isFlipping) {
-      pros::Task shake_task(shaky);
-    }
+  if (master.get_digital(DIGITAL_LEFT) && !isFlipping) {
+    pros::Task shake_task(shaky);
+  }
   // }
 }

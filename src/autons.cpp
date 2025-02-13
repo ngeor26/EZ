@@ -21,7 +21,7 @@ void default_constants() {
   // P, I, D, and Start I
   chassis.pid_drive_constants_set(22.0, 0.0, 100.0);         // Fwd/rev constants, used for odom and non odom motions
   chassis.pid_heading_constants_set(11.0, 0.0, 20.0);        // Holds the robot straight while going forward without odom
-  chassis.pid_turn_constants_set(3.0, 0.05, 21, 15.0);     // Turn in place constants
+  chassis.pid_turn_constants_set(3.0, 0.05, 21, 15.0);       // Turn in place constants
   chassis.pid_swing_constants_set(6.0, 0.0, 65.0);           // Swing constants
   chassis.pid_odom_angular_constants_set(6.5, 0.0, 52.5);    // Angular control for odom motions
   chassis.pid_odom_boomerang_constants_set(5.8, 0.0, 32.5);  // Angular control for boomerang motions
@@ -91,32 +91,32 @@ void turnBack() {
   chassis.pid_wait();
 }
 
-void turnToHeading(double heading){
+void turnToHeading(double heading) {
   chassis.pid_turn_set(heading, TURN_SPEED);
   chassis.pid_wait_quick();
 }
 
-void drive_dist(double dist, int speed=DRIVE_SPEED){
+void drive_dist(double dist, int speed = DRIVE_SPEED) {
   chassis.pid_drive_set(dist, speed);
   chassis.pid_wait_quick();
 }
 
-void testy(){
+void testy() {
   turnToHeading(27.7);
-  intake.move_velocity(-400);
+  runIntake(-400);
   drive_dist(34, 127);
   pros::delay(450);
   turnToHeading(90);
   drive_dist(-15, 55);
-  intake.move_velocity(0);
+  stopIntake();
   toggleMogo();
-  pros::Task flip_task([]{
+  pros::Task flip_task([] {
     pros::Task::delay(500);
     doFlip();
     toggleMogo();
   });
   turnToHeading(231);
-  intake.move_velocity(-400);
+  runIntake(-400);
   drive_dist(26, 127);
   drive_dist(29, 50);
   toggleMogo();
@@ -128,21 +128,21 @@ void testy(){
   // drive_dist(-12);
   chassis.drive_set(-50, -50);
   pros::delay(700);
-  chassis.drive_set(0,0);
+  chassis.drive_set(0, 0);
   // doFlip();
   flipper.move_absolute(-1060, 200);
   pros::delay(500);
   flipper.move_absolute(0, 55);
   drive_dist(3);
   turnToHeading(306);
-  intake.move_velocity(-300);
+  runIntake(-300);
   drive_dist(52, 127);
-  pros::Task mogoTask([]{
+  pros::Task mogoTask([] {
     toggleMogo();
   });
   turnToHeading(258);
   drive_dist(-18.5, 70);
-  pros::Task([]{
+  pros::Task([] {
     pros::Task::delay(200);
     flipper.move_absolute(-1150, 200);
     atBase = false;
@@ -153,81 +153,113 @@ void testy(){
   toggleMogo();
   // pros::delay(350);
   pros::delay(800);
-  intake.move_velocity(0);
+  stopIntake();
   // pros::Task flip_task2([] {
   // doFlipNoBack();
-    // flipper.move_absolute(-800, 200);
+  // flipper.move_absolute(-800, 200);
   // });
   drive_dist(-15, 127);
 }
 
-void mirrored(){
+void mirrored() {
   chassis.odom_x_flip();
   chassis.odom_theta_flip();
   testy();
 }
 
-void testy_cut(){
+void testy_cut() {
   turnToHeading(27.7);
-  intake.move_velocity(-300);
+  runIntake(-300);
   drive_dist(34, 127);
   turnToHeading(90);
   drive_dist(-15, 60);
-  intake.move_velocity(0);
+  stopIntake();
   toggleMogo();
-  pros::Task flip_task([]{
+  pros::Task flip_task([] {
     pros::Task::delay(1000);
     doFlip();
     toggleMogo();
   });
   turnToHeading(231);
-  intake.move_velocity(-300);
+  runIntake(-300);
   drive_dist(26, 127);
   drive_dist(29, 50);
   toggleMogo();
   turnToHeading(90);
-  intake.move_velocity(0);
+  stopIntake();
   drive_dist(15, 127);
   turnToHeading(360);
   // drive_dist(-12);
   chassis.drive_set(-127, -127);
   pros::delay(700);
-  chassis.drive_set(0,0);
+  chassis.drive_set(0, 0);
   // doFlip();
   flipper.move_absolute(-1060, 200);
   pros::delay(500);
   flipper.move_absolute(0, 55);
 }
 
-void skills(){
+bool stopIntakeBool = false;
+
+void runIntake(int velocity) {
+  intake.move_velocity(velocity);
+  pros::Task runCheck([velocity] {
+    bool isSlow = false;
+    while (true) {
+      if (stopIntakeBool) {
+        stopIntake();
+        break;
+      }
+      if (intake_limit.get_value() == 1 && !isSlow) {
+        isSlow = true;
+        runIntake(-300);   // configure speed
+        pros::delay(500);  // configure timeout
+        intake.move_velocity(velocity);
+        isSlow = false;
+      }
+      pros::delay(20);
+    }
+  });
+}
+
+void stopIntake() {
+  pros::Task stopTask([] {
+    stopIntakeBool = true;
+    pros::delay(50);
+    stopIntakeBool = false;
+  });
+}
+
+void skills() {
   doFlip();
   drive_dist(20);
   turnToHeading(53);
-  intake.move_velocity(-500);
+  runIntake(-500);
   drive_dist(69.5);
   pros::delay(800);
-  intake.move_velocity(0);
+  stopIntake();
+
+  // wall stake
   turnToHeading(270);
   pros::delay(200);
   toggleArm();
-  intake.move_velocity(500);
-  // drive_dist(-7.5, 50);
   chassis.drive_set(-50, -50);
   pros::delay(500);
   chassis.drive_set(0, 0);
   doFlip();
-  
+
+  // back right corner
   drive_dist(20);
   toggleArm();
   turnToHeading(22.6);
-  intake.move_velocity(-450);
+  runIntake(-450);
   drive_dist(51);
   pros::delay(600);
-  intake.move_velocity(0);
+  stopIntake();
   pros::delay(400);
   turnToHeading(20);
 
-
+  // come back for mogo
   drive_dist(-75);
   drive_dist(-30, 80);
   toggleMogo();
@@ -236,24 +268,26 @@ void skills(){
   drive_dist(47);
   turnToHeading(153);
   pros::delay(1000);
-  // intake.move_velocity(-500);
-  // drive_dist(40);
-  // pros::delay(600);
-  // drive_dist(-13);
-  // doFlip();
-  // turnToHeading(180);
-  // drive_dist(28.5, 100);
-  // pros::delay(900);
-  // doFlip();
-  // drive_dist(-6);
-  // turnToHeading(312);
-  // toggleMogo();
-  // drive_dist(-16);
-  // raiseMacro();
-  // drive_dist(67.3, 90);
-  // chassis.drive_set(-127, -127);
-  // pros::delay(3000 );
-  // chassis.drive_set(0,0);
+
+  // front left corner
+  runIntake(-500);
+  drive_dist(40);
+  pros::delay(600);
+  drive_dist(-13);
+  doFlip();
+  turnToHeading(180);
+  drive_dist(28.5, 100);
+  pros::delay(900);
+  doFlip();
+  drive_dist(-6);
+  turnToHeading(312);
+  toggleMogo();
+  drive_dist(-16);
+  raiseMacro();
+  drive_dist(67.3, 90);
+  chassis.drive_set(-127, -127);
+  pros::delay(3000);
+  chassis.drive_set(0, 0);
 }
 
 ///
