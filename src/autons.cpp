@@ -123,7 +123,7 @@ void testy(){
   pros::delay(200);
   turnToHeading(90);
   intake.move_velocity(80);
-  drive_dist(16, 127);
+  drive_dist(14, 127);
   turnToHeading(360);
   // drive_dist(-12);
   chassis.drive_set(-50, -50);
@@ -169,34 +169,48 @@ void mirrored(){
 
 void testy_cut(){
   turnToHeading(27.7);
-  intake.move_velocity(-300);
+  intake.move_velocity(-400);
   drive_dist(34, 127);
+  pros::delay(450);
   turnToHeading(90);
-  drive_dist(-15, 60);
+  drive_dist(-15, 55);
   intake.move_velocity(0);
   toggleMogo();
   pros::Task flip_task([]{
-    pros::Task::delay(1000);
+    pros::Task::delay(500);
     doFlip();
     toggleMogo();
   });
   turnToHeading(231);
-  intake.move_velocity(-300);
+  intake.move_velocity(-400);
   drive_dist(26, 127);
   drive_dist(29, 50);
   toggleMogo();
+  pros::delay(200);
   turnToHeading(90);
-  intake.move_velocity(0);
-  drive_dist(15, 127);
+  intake.move_velocity(80);
+  drive_dist(14, 127);
   turnToHeading(360);
   // drive_dist(-12);
-  chassis.drive_set(-127, -127);
+  chassis.drive_set(-50, -50);
   pros::delay(700);
   chassis.drive_set(0,0);
   // doFlip();
   flipper.move_absolute(-1060, 200);
   pros::delay(500);
   flipper.move_absolute(0, 55);
+  // drive_dist(3);
+  // turnToHeading(54);
+  // drive_dist(52, 127);
+  // turnToHeading(102);
+  // toggleArm();
+  // drive_dist(-23, 70);
+}
+
+void cut_mirrored(){
+  chassis.odom_x_flip();
+  chassis.odom_theta_flip();
+  testy_cut();
 }
 
 void skills(){
@@ -204,7 +218,7 @@ void skills(){
   drive_dist(20);
   turnToHeading(53);
   intake.move_velocity(-500);
-  drive_dist(69.5);
+  drive_dist(71.5);
   pros::delay(800);
   intake.move_velocity(0);
   turnToHeading(270);
@@ -234,26 +248,27 @@ void skills(){
   pros::delay(600);
   doFlip();
   drive_dist(47);
-  turnToHeading(153);
-  pros::delay(1000);
-  // intake.move_velocity(-500);
-  // drive_dist(40);
-  // pros::delay(600);
-  // drive_dist(-13);
-  // doFlip();
-  // turnToHeading(180);
-  // drive_dist(28.5, 100);
-  // pros::delay(900);
-  // doFlip();
-  // drive_dist(-6);
-  // turnToHeading(312);
-  // toggleMogo();
-  // drive_dist(-16);
-  // raiseMacro();
-  // drive_dist(67.3, 90);
-  // chassis.drive_set(-127, -127);
-  // pros::delay(3000 );
-  // chassis.drive_set(0,0);
+  turnToHeading(148);
+  pros::delay(5000);
+
+  intake.move_velocity(-500);
+  drive_dist(41);
+  pros::delay(600);
+  drive_dist(-15);
+  doFlip();
+  turnToHeading(180);
+  drive_dist(28.5, 100);
+  pros::delay(1200);
+  doFlip();
+  drive_dist(-6);
+  turnToHeading(312);
+  toggleMogo();
+  drive_dist(-16);
+  raiseMacro();
+  drive_dist(67.3, 60);
+  chassis.drive_set(-127, -127);
+  pros::delay(3000 );
+  chassis.drive_set(0,0);
 }
 
 ///

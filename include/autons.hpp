@@ -13,6 +13,7 @@ void turnBack();
 void testy();
 void mirrored();
 void testy_cut();
+void cut_mirrored();
 void skills();
 void swing_example();
 void motion_chaining();

@@ -169,11 +169,11 @@ void insideopcontrol() {
     //   pros::Task mogo_task(toggleMogo);
     // }
 
-    // if (master.get_digital(DIGITAL_L1)) {
-    //   mogo.set_value(false);
-    // } else {
-    //   mogo.set_value(true);
-    // }
+    if (master.get_digital(DIGITAL_L1)) {
+      mogo.set_value(false);
+    } else {
+      mogo.set_value(true);
+    }
 
     if (master.get_digital(DIGITAL_X) && canDoinker) {
       pros::Task doinker_task(toggleDoinker);

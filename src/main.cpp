@@ -33,13 +33,14 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-    {"skills", skills},
-        {"fun red", testy},
-    {"fun blue", testy},
-        {"mirrored red", mirrored},
-          {"mirrored blue", mirrored},
-    {"cut red", testy_cut},
-    {"cut blue", testy_cut},
+          {"SAWP red (right)", testy},
+    {"SAWP blue (right)", testy},
+        {"SAWP mirrored red (left)", mirrored},
+          {"SAWP mirrored blue (left)", mirrored},
+    {"cut red (right)", testy_cut},
+    {"cut blue (right)", testy_cut},
+    {"cut red mirrored (left)", cut_mirrored},
+    {"cut blue mirrored (left)", cut_mirrored},
         {"skills", skills},
 
     
@@ -182,12 +183,14 @@ void opcontrol() {
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
 
-  if(ez::as::auton_selector.auton_page_current == 1 || ez::as::auton_selector.auton_page_current == 3 || ez::as::auton_selector.auton_page_current == 5){
-    color = "blue";
-  } else if(ez::as::auton_selector.auton_page_current == 0 || ez::as::auton_selector.auton_page_current == 2 || ez::as::auton_selector.auton_page_current == 4) {
-    color = "red";
-  } else if(ez::as::auton_selector.auton_page_current == 6){
+  if(ez::as::auton_selector.auton_page_current == 8){
     return;
+  }
+
+  if((ez::as::auton_selector.auton_page_current % 2) != 0){
+    color = "blue";
+  } else if((ez::as::auton_selector.auton_page_current % 2) == 0) {
+    color = "red";
   }
 
   
