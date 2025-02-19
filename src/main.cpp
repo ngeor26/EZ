@@ -19,6 +19,8 @@ void initialize() {
   // Print our branding over your terminal :D
   ez::ez_template_print();
 
+  flipperRotation.reset_position();
+
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
 
   chassis.odom_tracker_front_set(&horiz_tracker);

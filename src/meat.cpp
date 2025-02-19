@@ -1,6 +1,9 @@
 #include <math.h>
 #include <type_traits>
+#include "EZ-Template/util.hpp"
 #include "main.h"
+#include "pros/misc.h"
+#include "pros/rtos.hpp"
 
 bool isFlipping = false;
 
@@ -24,13 +27,22 @@ std::string colorStack[2] = {"", ""};
 
 std::string color = "blue";
 
+// void flipTask(){
+//   while(true){
+//     flipper.move(flipperPID.compute(rotation.get_position()));
+//     pros::delay(ez::util::DELAY_TIME);
+//   }
+// }
+
+// pros::Task Lift_Task(flipTask);
+
 void doFlip() {
   atBase = false;
   isFlipping = true;
   if ((color == "blue" && colorStack[0] == "Red") || (color == "red" && colorStack[0] == "Blue")) {
-    flipper.move_absolute(-700, 150);
+    // flipper.move_absolute(-700, 150);
   } else {
-    flipper.move_absolute(-1150, 200);
+    // flipper.move_absolute(-1150, 200);
   }
   pros::delay(500);
   flipper.move_absolute(0, 55);
