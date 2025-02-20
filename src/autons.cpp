@@ -249,7 +249,7 @@ void skills(){
   doFlip();
   drive_dist(47);
   turnToHeading(148);
-  pros::delay(5000);
+  // pros::delay(5000);
 
   intake.move_velocity(-500);
   drive_dist(41);

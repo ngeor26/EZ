@@ -2,8 +2,8 @@
 #include <type_traits>
 #include "EZ-Template/util.hpp"
 #include "main.h"
-#include "pros/misc.h"
 #include "pros/rtos.hpp"
+#include "subsystems.hpp"
 
 bool isFlipping = false;
 
@@ -27,22 +27,13 @@ std::string colorStack[2] = {"", ""};
 
 std::string color = "blue";
 
-// void flipTask(){
-//   while(true){
-//     flipper.move(flipperPID.compute(rotation.get_position()));
-//     pros::delay(ez::util::DELAY_TIME);
-//   }
-// }
-
-// pros::Task Lift_Task(flipTask);
-
 void doFlip() {
   atBase = false;
   isFlipping = true;
   if ((color == "blue" && colorStack[0] == "Red") || (color == "red" && colorStack[0] == "Blue")) {
-    // flipper.move_absolute(-700, 150);
+    flipper.move_absolute(-700, 150);
   } else {
-    // flipper.move_absolute(-1150, 200);
+    flipper.move_absolute(-1150, 200);
   }
   pros::delay(500);
   flipper.move_absolute(0, 55);
@@ -149,16 +140,16 @@ void insideopcontrol() {
   // while (true) {
     hasSecond = ultrasonic.get_value() > 50;
 
-    if (master.get_digital(DIGITAL_R2) && flipper.get_position() > -50 && (!(colorStack[0] != "" && colorStack[1] != "") || master.get_digital(DIGITAL_Y))) {
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2) && flipper.get_position() > -50 && (!(colorStack[0] != "" && colorStack[1] != "") || master.get_digital(pros::E_CONTROLLER_DIGITAL_Y))) {
       intake.move_velocity(-450);
-    } else if (master.get_digital(DIGITAL_L2)) {
+    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
       intake.move_velocity(550);
     } else {
       intake.move_velocity(0);
     }
 
     if (!isFlipping) {
-      if (master.get_digital(DIGITAL_RIGHT)) {
+      if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
         atBase = false;
         flipper.move_absolute(-1150, 150);
       } else {
@@ -169,33 +160,33 @@ void insideopcontrol() {
       }
     }
 
-    if (master.get_digital(DIGITAL_B) && canRaise) {
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B) && canRaise) {
       pros::Task raise_task(toggleArm);
     }
 
-    if (master.get_digital(DIGITAL_A) && canRaise) {
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && canRaise) {
       pros::Task raise_macro(raiseMacro);
     }
 
-    // if (master.get_digital(DIGITAL_L1) && canMogo) {
+    // if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1) && canMogo) {
     //   pros::Task mogo_task(toggleMogo);
     // }
 
-    if (master.get_digital(DIGITAL_L1)) {
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
       mogo.set_value(false);
     } else {
       mogo.set_value(true);
     }
 
-    if (master.get_digital(DIGITAL_X) && canDoinker) {
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X) && canDoinker) {
       pros::Task doinker_task(toggleDoinker);
     }
 
-    if (master.get_digital(DIGITAL_R1) && !isFlipping) {
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1) && !isFlipping) {
       pros::Task flip_task(doFlip);
     }
 
-    if (master.get_digital(DIGITAL_LEFT) && !isFlipping) {
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT) && !isFlipping) {
       pros::Task shake_task(shaky);
     }
   // }
