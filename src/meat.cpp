@@ -25,7 +25,7 @@ bool atBase = true;
 
 std::string colorStack[2] = {"", ""};
 
-std::string color = "blue";
+std::string color;
 
 void doFlip() {
   atBase = false;
@@ -35,6 +35,17 @@ void doFlip() {
   } else {
     flipper.move_absolute(-1150, 200);
   }
+  pros::delay(500);
+  flipper.move_absolute(0, 55);
+  pros::delay(800);
+  isFlipping = false;
+  atBase = true;
+}
+
+void justFlip(){
+  atBase = false;
+  isFlipping = true;
+  flipper.move_absolute(-1150, 200);
   pros::delay(500);
   flipper.move_absolute(0, 55);
   pros::delay(800);
@@ -130,7 +141,7 @@ void update_colorStack() {
       }
     }
 
-    // std::cout << "Bottom: " + colorStack[0] << " Top: " + colorStack[1] << std::endl;
+    std::cout << "Bottom: " + colorStack[0] << " Top: " + colorStack[1] << std::endl;
 
     // pros::delay(200);
   // }

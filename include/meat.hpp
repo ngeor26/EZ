@@ -31,6 +31,7 @@ extern std::string color;
 
 // Function declarations
 void doFlip();
+void justFlip();
 void doFlipNoBack();
 void toggleArm();
 void raiseMacro();
